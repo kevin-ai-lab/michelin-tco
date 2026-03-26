@@ -126,11 +126,6 @@ with st.sidebar:
         mich_event_cost = st.number_input("Cost per Service Call ($)", value=350.0, step=10.0, key="m_ec")
         mich_fuel_gain = st.number_input("Fuel Efficiency Gain (%)", value=3.0, step=0.1, key="m_fg") / 100.0
 
-    with st.expander("💵 Payload Revenue Gain (X One)", expanded=False):
-        weight_saved = st.number_input("Weight Saved (lbs) / Truck", value=0.0, step=100.0)
-        revenue_per_lb = st.number_input("Revenue per lb ($)", value=0.05, step=0.01)
-        annual_trips = st.number_input("Billable Trips / Year", value=0, step=10)
-
 
 # Build Data Dicts
 fleet_data = {
@@ -161,9 +156,9 @@ mich_tire = {
 }
 
 extra_rev = {
-    'weightSaved': weight_saved,
-    'revenuePerLb': revenue_per_lb,
-    'annualTrips': annual_trips
+    'weightSaved': 0,
+    'revenuePerLb': 0,
+    'annualTrips': 0
 }
 
 # Calculate TCO
@@ -205,11 +200,10 @@ mich_total = tco['michelin']['total']
 hw_delta = tco['michelin']['hardware'] - tco['competitor']['hardware']
 fuel_delta = tco['michelin']['fuel'] - tco['competitor']['fuel']
 dt_delta = tco['michelin']['downtime'] - tco['competitor']['downtime']
-payload_delta = -tco['michelin']['payload'] # Payload is pure savings
 
-x_labels = ["Competitor Total", "Hardware Diff", "Fuel Savings", "Downtime Savings", "Payload Rev", "Michelin Total"]
-y_values = [comp_total, hw_delta, fuel_delta, dt_delta, payload_delta, mich_total]
-measures = ["absolute", "relative", "relative", "relative", "relative", "total"]
+x_labels = ["Competitor Total", "Hardware Diff", "Fuel Savings", "Downtime Savings", "Michelin Total"]
+y_values = [comp_total, hw_delta, fuel_delta, dt_delta, mich_total]
+measures = ["absolute", "relative", "relative", "relative", "total"]
 
 fig = go.Figure(go.Waterfall(
     name="TCO",
@@ -248,6 +242,3 @@ fig.update_traces(
 )
 
 st.plotly_chart(fig, use_container_width=True)
-
-if tco['michelin']['payload'] > 0:
-    st.info(f"Michelin TCO includes an embedded payload revenue offset of **${tco['michelin']['payload']:,.0f}** per truck.")
