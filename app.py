@@ -170,15 +170,21 @@ tire_step = (tco['competitor']['hardware'] - tco['michelin']['hardware']) * num_
 fuel_step = (tco['competitor']['fuel'] - tco['michelin']['fuel']) * num_trucks
 downtime_step = (tco['competitor']['downtime'] - tco['michelin']['downtime']) * num_trucks
 
+# Calculate the custom Red Box metric defined by user
+comp_tires_initial_cost = fleet_data['numTrucks'] * fleet_data['tiresPerTruck'] * comp_tire['price']
+red_box_value = comp_tires_initial_cost + tire_step + fuel_step + downtime_step
+
 # 3. Update the Maximum Chart Height: Recalculate max theoretical height
 max_possible_total = mich_total + tire_step + fuel_step + downtime_step
+max_y = max(mich_total, max_possible_total, red_box_value)
 
 # 2. Define the new X-Axis Labels
 x_labels = [
     "Michelin Total<br>(Excl. Fuel)", 
     "Early Replacement Penalty", 
     "Excess Fuel Cost", 
-    "Excess Downtime Cost"
+    "Excess Downtime Cost",
+    "Tire-Related Operating<br>Costs & Penalties"
 ]
 
 # 3. Format text labels dynamically
@@ -192,7 +198,8 @@ text_labels = [
     f"${mich_total:,.0f}", 
     format_label(tire_step), 
     format_label(fuel_step), 
-    format_label(downtime_step)
+    format_label(downtime_step),
+    "" # Empty text for the invisible waterfall slot
 ]
 
 fig = go.Figure()
@@ -201,9 +208,9 @@ fig = go.Figure()
 fig.add_trace(go.Waterfall(
     name="Cost of Inaction",
     orientation="v",
-    measure=["absolute", "relative", "relative", "relative"],
+    measure=["absolute", "relative", "relative", "relative", "absolute"],
     x=x_labels,
-    y=[mich_total, tire_step, fuel_step, downtime_step],
+    y=[mich_total, tire_step, fuel_step, downtime_step, 0], # 0 creates the slot without drawing a blue totals bar
     text=text_labels,
     textposition="outside",
     hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>",
@@ -213,10 +220,19 @@ fig.add_trace(go.Waterfall(
     connector={"line": {"color": "rgb(200, 200, 200)", "width": 1, "dash": "dot"}},
 ))
 
+# 5. Overlay the Custom Red Box at the identical X-Axis string
+fig.add_trace(go.Bar(
+    x=["Tire-Related Operating<br>Costs & Penalties"], 
+    y=[red_box_value], 
+    marker_color="#EF4444", # Red Box requested by user
+    hoverinfo="skip",
+    showlegend=False,
+    text=[f"<b>${red_box_value:,.0f}</b>"], 
+    textposition="outside",
+))
+
 # Calculate Y-axis truncation range
 min_y = mich_total
-max_y = max(mich_total, max_possible_total)
-
 if tire_step < 0:
     min_y = min(min_y, mich_total + tire_step)
 if fuel_step < 0:
