@@ -244,14 +244,8 @@ fig.add_trace(go.Bar(
     textposition="none",
 ))
 
-# Calculate Y-axis truncation range
-min_y = min(mich_tires_initial_cost, comp_tires_initial_cost)
-if tire_step < 0:
-    min_y = min(min_y, comp_tires_initial_cost + tire_step)
-if fuel_step < 0:
-    min_y = min(min_y, comp_tires_initial_cost + tire_step + fuel_step)
-
-axis_min = min_y * 0.95
+# Calculate Y-axis range to enforce a zero-bound baseline
+axis_min = 0
 axis_max = max_y * 1.05
 
 # 6. Layout updates (Enforcing strict height constraint and zero vertical margins)
