@@ -227,9 +227,9 @@ hw_delta = tco['michelin']['hardware'] - tco['competitor']['hardware']
 fuel_delta = tco['michelin']['fuel'] - tco['competitor']['fuel']
 dt_delta = tco['michelin']['downtime'] - tco['competitor']['downtime']
 
-x_labels = ["Competitor Total", "Tire Cost Difference", "Fuel Savings", "Downtime Savings", "Michelin Total"]
-y_values = [comp_total, hw_delta, fuel_delta, dt_delta, mich_total]
-measures = ["absolute", "relative", "relative", "relative", "total"]
+x_labels = ["Tire Cost Difference", "Fuel Savings", "Downtime Savings", "Michelin Total"]
+y_values = [hw_delta, fuel_delta, dt_delta, mich_total]
+measures = ["relative", "relative", "relative", "total"]
 
 # Calculate Y-axis truncation range
 min_y = min(comp_total, mich_total)
@@ -240,30 +240,49 @@ if hw_delta > 0:
 axis_min = min_y * 0.95
 axis_max = max_y * 1.05
 
-# Determine dynamic colors for each waterfall bar
-bar_colors = [
-    "#F97316", # 0: Orange for Competitor Total
-    "#EF4444" if hw_delta > 0 else "#10B981", # 1: Red if hardware costs more, green if it saves
-    "#EF4444" if fuel_delta > 0 else "#10B981", # 2: Fuel
-    "#EF4444" if dt_delta > 0 else "#10B981", # 3: Downtime
-    "#27509B"  # 4: Michelin Blue for Final Total
-]
+fig = go.Figure()
 
-fig = go.Figure(go.Waterfall(
+# 1. Competitor Total Bar (Explicitly Orange)
+fig.add_trace(go.Bar(
+    name="Competitor",
+    x=["Competitor Total"],
+    y=[comp_total],
+    marker_color="#F97316",
+    text=[f"${comp_total:,.0f}"],
+    textposition="outside",
+    hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>"
+))
+
+# 2. Michelin TCO Bridge (Waterfall starting from Competitor's height)
+fig.add_trace(go.Waterfall(
     name="TCO",
     orientation="v",
     measure=measures,
     x=x_labels,
+    y=y_values,
+    base=comp_total,
     textposition="outside",
     text=[f"${abs(v):,.0f}" for v in y_values],
-    y=y_values,
     connector={"line": {"color": "rgb(200, 200, 200)", "width": 1, "dash": "dot"}},
-    marker={"color": bar_colors}
+    decreasing={"marker": {"color": "#10B981"}},  # Green for savings
+    increasing={"marker": {"color": "#EF4444"}},  # Red for added cost
+    totals={"marker": {"color": "#27509B"}},      # Michelin Blue for totals
+    hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>"
 ))
+
+# 3. Add manual connector line to bridge the two traces visually
+fig.add_shape(
+    type="line",
+    x0="Competitor Total", y0=comp_total,
+    x1="Tire Cost Difference", y1=comp_total,
+    line=dict(color="rgb(200, 200, 200)", width=1, dash="dot"),
+    layer="below"
+)
 
 # Set background to transparent since we are in light mode
 fig.update_layout(
     title="",
+    showlegend=False,
     waterfallgap=0.3,
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
