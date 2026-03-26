@@ -158,20 +158,20 @@ st.divider()
 # ----------------- CHART SECTION -----------------
 
 # 3. Waterfall Chart for Cost Bridge
-st.markdown("### Tire-Related Operating Costs & Penalties")
+st.markdown("### Tire-Related Operating Costs & Penalties (Per Truck)")
 
 num_trucks = fleet_data['numTrucks']
 
 # 1. Update Starting Bar: Isolate the massive base fuel to emphasize penalties
-mich_total = (tco['michelin']['hardware'] + tco['michelin']['downtime']) * num_trucks
+mich_total = tco['michelin']['hardware'] + tco['michelin']['downtime']
 
 # 2. Keep the Steps Exactly the Same (Delta Math)
-tire_step = (tco['competitor']['hardware'] - tco['michelin']['hardware']) * num_trucks
-fuel_step = (tco['competitor']['fuel'] - tco['michelin']['fuel']) * num_trucks
-downtime_step = (tco['competitor']['downtime'] - tco['michelin']['downtime']) * num_trucks
+tire_step = tco['competitor']['hardware'] - tco['michelin']['hardware']
+fuel_step = tco['competitor']['fuel'] - tco['michelin']['fuel']
+downtime_step = tco['competitor']['downtime'] - tco['michelin']['downtime']
 
-# Calculate the custom Red Box metric defined by user
-comp_tires_initial_cost = fleet_data['numTrucks'] * fleet_data['tiresPerTruck'] * comp_tire['price']
+# Calculate the custom Red Box & Green Box metrics defined by user
+comp_tires_initial_cost = fleet_data['tiresPerTruck'] * comp_tire['price']
 red_box_value = comp_tires_initial_cost + tire_step + fuel_step + downtime_step
 
 # 3. Update the Maximum Chart Height: Recalculate max theoretical height
