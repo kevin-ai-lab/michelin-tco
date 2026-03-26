@@ -158,7 +158,7 @@ st.divider()
 # ----------------- CHART SECTION -----------------
 
 # 3. Waterfall Chart for Cost Bridge
-st.markdown("### Tire-Related Operating Costs & Penalties (Per Truck)")
+st.markdown("### Tire-Related Operating Costs & Penalties (Per Truck, over Annual Miles)")
 
 num_trucks = fleet_data['numTrucks']
 
@@ -217,16 +217,16 @@ fig.add_trace(go.Waterfall(
     textposition="outside",
     hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>",
     increasing={"marker": {"color": "#EF4444"}}, # Red Alert for extra costs
-    decreasing={"marker": {"color": "#10B981"}}, # Green
+    decreasing={"marker": {"color": "#6B7280"}}, # Grey for savings / downward steps
     totals={"marker": {"color": "#27509B"}},     # Official Michelin Blue for the base bar (Left)
     connector={"line": {"color": "rgb(200, 200, 200)", "width": 1, "dash": "dot"}},
 ))
 
-# 4.5 Overlay the Green Competitor Box based on pure purchase price
+# 4.5 Overlay the Grey Competitor Box based on pure purchase price
 fig.add_trace(go.Bar(
     x=["Competitor Upfront<br>Purchase"], 
     y=[comp_tires_initial_cost], 
-    marker_color="#10B981", # Green Box requested by user
+    marker_color="#6B7280", # Grey Box requested by user
     hoverinfo="skip",
     showlegend=False,
     text=[""], # Hide text to prevent double-printing from the active waterfall below it
