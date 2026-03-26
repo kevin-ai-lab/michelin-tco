@@ -244,10 +244,6 @@ fig.add_trace(go.Bar(
     textposition="none",
 ))
 
-# Calculate Y-axis range to enforce a zero-bound baseline
-axis_min = 0
-axis_max = max_y * 1.05
-
 # 6. Layout updates (Enforcing strict height constraint and zero vertical margins)
 fig.update_layout(
     height=380,
@@ -262,8 +258,8 @@ fig.update_layout(
     yaxis=dict(
         gridcolor='#E2E8F0', 
         tickprefix='$', 
-        zeroline=False,
-        range=[axis_min, axis_max] # Truncated Y-Axis
+        zeroline=True,
+        rangemode='tozero' # Mathematically enforce a 0-floor but allow Plotly to auto-calculate the perfect ceiling for the text
     ),
     xaxis=dict(
         gridcolor='rgba(0,0,0,0)',
