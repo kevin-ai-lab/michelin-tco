@@ -168,7 +168,7 @@ downtime_step = tco['competitor']['downtime'] - tco['michelin']['downtime']
 # 2. Define the new X-Axis Labels
 x_labels = [
     "Michelin Total", 
-    "Extra Tire Cost", 
+    "Early Replacement Penalty", 
     "Excess Fuel Cost", 
     "Excess Downtime Cost", 
     "Competitor Total"
