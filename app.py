@@ -240,19 +240,25 @@ if hw_delta > 0:
 axis_min = min_y * 0.95
 axis_max = max_y * 1.05
 
+# Determine dynamic colors for each waterfall bar
+bar_colors = [
+    "#F97316", # 0: Orange for Competitor Total
+    "#EF4444" if hw_delta > 0 else "#10B981", # 1: Red if hardware costs more, green if it saves
+    "#EF4444" if fuel_delta > 0 else "#10B981", # 2: Fuel
+    "#EF4444" if dt_delta > 0 else "#10B981", # 3: Downtime
+    "#27509B"  # 4: Michelin Blue for Final Total
+]
+
 fig = go.Figure(go.Waterfall(
     name="TCO",
     orientation="v",
     measure=measures,
     x=x_labels,
     textposition="outside",
-    # Absolute value formatting for step labels
     text=[f"${abs(v):,.0f}" for v in y_values],
     y=y_values,
     connector={"line": {"color": "rgb(200, 200, 200)", "width": 1, "dash": "dot"}},
-    decreasing={"marker": {"color": "#10B981"}},  # Tailwind Emerald for savings
-    increasing={"marker": {"color": "#EF4444"}},  # Red for added cost
-    totals={"marker": {"color": "#27509B"}},      # Michelin Blue for totals
+    marker={"color": bar_colors}
 ))
 
 # Set background to transparent since we are in light mode
