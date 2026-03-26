@@ -10,6 +10,12 @@ st.set_page_config(page_title="MICHELIN B2B TCO Calculator", layout="wide", page
 # Inject Custom Light-Mode B2B CSS
 st.markdown("""
 <style>
+    /* Crush massive default Streamlit top padding to move everything up */
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 1rem !important;
+    }
+
     /* Headers & Text */
     h1, h2, h3, h4, span, p {
         font-family: 'Inter', sans-serif;
