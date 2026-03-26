@@ -62,19 +62,17 @@ def calculate_tco(fleet_data, comp_tire, mich_tire):
     
     upfront_delta_per_truck = (mich_tire['price'] - comp_tire['price']) * fleet_data['tiresPerTruck']
     
-    # Break-Even Math uses OPERATIONAL savings (Fuel + Downtime), isolating the hardware cash difference
-    comp_ops_cost = comp_fuel + comp_downtime
-    mich_ops_cost = mich_fuel + mich_downtime
-    operational_savings_per_year = comp_ops_cost - mich_ops_cost
-    operational_savings_per_mile = operational_savings_per_year / fleet_data['annualMiles'] if fleet_data['annualMiles'] > 0 else 0
+    # Break-Even Math updated to perfectly align with the Chart's 3 penalty blocks
+    # by using total annualized savings (Hardware + Fuel + Downtime)
+    total_savings_per_mile = savings_per_mile
 
     # Safe Break-Even Edge Cases
     if upfront_delta_per_truck <= 0:
         # Michelin is cheaper or equal upfront; instant ROI
         break_even_miles = 0 
-    elif operational_savings_per_mile > 0:
-        # Michelin costs more upfront, but saves money operationally
-        break_even_miles = upfront_delta_per_truck / operational_savings_per_mile
+    elif total_savings_per_mile > 0:
+        # Michelin costs more upfront, but saves money comprehensively over time
+        break_even_miles = upfront_delta_per_truck / total_savings_per_mile
     else:
         # Michelin costs more upfront AND costs more to run. Never breaks even.
         break_even_miles = None 
