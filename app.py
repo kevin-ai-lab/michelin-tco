@@ -277,7 +277,7 @@ fig.update_layout(
 )
 
 fig.update_traces(
-    hovertemplate="<b>%{x}</b><br>Amount: $%{y:,.0f}<extra></extra>"
+    hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>"
 )
 
 st.plotly_chart(fig, use_container_width=True)
