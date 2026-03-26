@@ -162,8 +162,9 @@ st.markdown("### Tire-Related Operating Costs & Penalties (Per Truck)")
 
 num_trucks = fleet_data['numTrucks']
 
-# 1. Update Starting Bar: Isolate the massive base fuel to emphasize penalties
-mich_total = tco['michelin']['hardware'] + tco['michelin']['downtime']
+# 1. Update Starting Bars: Honest upfront purchase prices
+mich_tires_initial_cost = fleet_data['tiresPerTruck'] * mich_tire['price']
+comp_tires_initial_cost = fleet_data['tiresPerTruck'] * comp_tire['price']
 
 # 2. Keep the Steps Exactly the Same (Delta Math)
 tire_step = tco['competitor']['hardware'] - tco['michelin']['hardware']
@@ -171,17 +172,15 @@ fuel_step = tco['competitor']['fuel'] - tco['michelin']['fuel']
 downtime_step = tco['competitor']['downtime'] - tco['michelin']['downtime']
 
 # Calculate the custom Red Box & Green Box metrics defined by user
-comp_tires_initial_cost = fleet_data['tiresPerTruck'] * comp_tire['price']
 red_box_value = comp_tires_initial_cost + tire_step + fuel_step + downtime_step
 
 # 3. Update the Maximum Chart Height: Recalculate max theoretical height
-max_possible_total = mich_total + tire_step + fuel_step + downtime_step
-max_y = max(mich_total, max_possible_total, red_box_value)
+max_y = max(mich_tires_initial_cost, red_box_value)
 
 # 2. Define the new X-Axis Labels
 x_labels = [
-    "Michelin Total<br>(Excl. Fuel)", 
-    "Competitor Total<br>(Excl. Fuel)",
+    "Michelin Upfront<br>Purchase", 
+    "Competitor Upfront<br>Purchase",
     "Early Replacement Penalty", 
     "Excess Fuel Cost", 
     "Excess Downtime Cost",
@@ -196,7 +195,7 @@ def format_label(val):
         return f"-${abs(val):,.0f}"
 
 text_labels = [
-    f"${mich_total:,.0f}", 
+    f"${mich_tires_initial_cost:,.0f}", 
     "", # Empty text for the green Competitor Box overlay slot
     format_label(tire_step), 
     format_label(fuel_step), 
@@ -210,9 +209,9 @@ fig = go.Figure()
 fig.add_trace(go.Waterfall(
     name="Cost of Inaction",
     orientation="v",
-    measure=["absolute", "relative", "relative", "relative", "relative", "absolute"],
+    measure=["absolute", "absolute", "relative", "relative", "relative", "absolute"],
     x=x_labels,
-    y=[mich_total, 0, tire_step, fuel_step, downtime_step, 0], # 0 creates the invisible overlay slots
+    y=[mich_tires_initial_cost, comp_tires_initial_cost, tire_step, fuel_step, downtime_step, 0], # 0 creates the invisible overlay slots
     text=text_labels,
     textposition="outside",
     hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>",
@@ -224,7 +223,7 @@ fig.add_trace(go.Waterfall(
 
 # 4.5 Overlay the Green Competitor Box based on pure purchase price
 fig.add_trace(go.Bar(
-    x=["Competitor Total<br>(Excl. Fuel)"], 
+    x=["Competitor Upfront<br>Purchase"], 
     y=[comp_tires_initial_cost], 
     marker_color="#10B981", # Green Box requested by user
     hoverinfo="skip",
@@ -245,11 +244,11 @@ fig.add_trace(go.Bar(
 ))
 
 # Calculate Y-axis truncation range
-min_y = mich_total
+min_y = min(mich_tires_initial_cost, comp_tires_initial_cost)
 if tire_step < 0:
-    min_y = min(min_y, mich_total + tire_step)
+    min_y = min(min_y, comp_tires_initial_cost + tire_step)
 if fuel_step < 0:
-    min_y = min(min_y, mich_total + tire_step + fuel_step)
+    min_y = min(min_y, comp_tires_initial_cost + tire_step + fuel_step)
 
 axis_min = min_y * 0.95
 axis_max = max_y * 1.05
