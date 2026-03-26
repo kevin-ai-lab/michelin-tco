@@ -19,88 +19,27 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
     }
     
-    .yellow-text {
-        color: #FCE500 !important;
-        font-weight: 800;
-    }
-    .blue-text {
-        color: #27509B !important;
-    }
-
-    /* Giant Fleet Savings Metric - Navy Box for Contrast against #FCE500 */
-    .giant-savings-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: #27509B;
-        border-radius: 12px;
-        padding: 2.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .giant-savings-label {
-        color: #FFFFFF;
-        font-size: 1.25rem;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-    .giant-savings-value {
-        color: #FCE500;
-        font-size: 5rem;
-        font-weight: 900;
-        line-height: 1;
-        /* Text glow removed as requested */
-    }
-    .giant-savings-subtext {
-        color: #E2E8F0;
-        font-size: 1rem;
-        margin-top: 0.5rem;
-    }
-
-    /* Demoted Break Even Metric */
-    .secondary-metric {
-        background: #F8FAFC;
-        border: 1px solid #E2E8F0;
-        border-radius: 12px;
-        padding: 1rem 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-    .sec-title {
-        color: #64748B;
-        font-size: 1rem;
-        font-weight: 500;
-    }
-    .sec-value {
-        color: #0F172A;
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-    .sec-subtext {
-        color: #10B981; /* Green delta color */
-        font-size: 0.9rem;
-        font-weight: 600;
-        text-align: right;
-    }
-
     /* Streamlit Metric Overrides for Light Mode */
     div[data-testid="stMetric"] {
         background: #FFFFFF;
         border: 1px solid #E2E8F0;
-        border-radius: 12px;
-        padding: 1rem;
+        border-radius: 8px;
+        padding: 10px 15px;
         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Main Title (Styling removed logo string from title)
-st.markdown('<h1>B2B TCO Calculator</h1>', unsafe_allow_html=True)
+# ----------------- HEADER & CTA -----------------
+header_col, cta_col = st.columns([3, 1])
+
+with header_col:
+    st.title("B2B TCO Calculator")
+
+with cta_col:
+    st.write("") # Small vertical spacer to align
+    st.button("Contact a Fleet Expert", type="primary", use_container_width=True)
+
 
 # ----------------- REORGANIZED SIDEBAR CONTROLS -----------------
 with st.sidebar:
@@ -108,33 +47,41 @@ with st.sidebar:
     
     with st.expander("Fleet Profile", expanded=True):
         colA, colB = st.columns(2)
-        num_trucks = colA.number_input("Total Class 8 Trucks", value=50, step=1)
-        tires_per_truck = colB.number_input("Tires per Truck", value=18, step=1)
-        annual_miles = st.number_input("Annual Miles/Truck", value=100000, step=1000)
-        mpg = st.number_input("Fleet Avg MPG", value=6.5, step=0.1)
+        with colA:
+            num_trucks = st.number_input("Total Trucks", value=50, step=1)
+            annual_miles = st.number_input("Annual Miles", value=100000, step=1000)
+        with colB:
+            tires_per_truck = st.number_input("Tires/Truck", value=18, step=1)
+            mpg = st.number_input("Fleet MPG", value=6.5, step=0.1)
 
     with st.expander("Operating Costs", expanded=True):
-        fuel_price = st.number_input("Fuel Price / Gallon ($)", value=4.00, step=0.05)
         colC, colD = st.columns(2)
-        downtime_cost = colC.number_input("Downtime Cost/Hr ($)", value=120.0, step=5.0)
-        downtime_hours = colD.number_input("Hours per Event", value=3.0, step=0.5)
+        with colC:
+            fuel_price = st.number_input("Fuel Price ($)", value=4.00, step=0.05)
+            downtime_hours = st.number_input("Hrs per Event", value=3.0, step=0.5)
+        with colD:
+            downtime_cost = st.number_input("Downtime/Hr ($)", value=120.0, step=5.0)
 
-    with st.expander("Tire Parameters", expanded=True):
-        st.markdown("**Current Tire (Competitor)**")
-        comp_price = st.number_input("Purchase Price ($)", value=350.0, step=10.0, key="c_p")
-        comp_casing = st.number_input("Casing Value ($)", value=40.0, step=5.0, key="c_c")
-        comp_life = st.number_input("Expected Tread Mileage", value=120000, step=5000, key="c_l")
-        comp_events = st.number_input("Annual Events / Truck", value=1.5, step=0.1, key="c_e")
-        comp_event_cost = st.number_input("Cost per Service Call ($)", value=350.0, step=10.0, key="c_ec")
-        
-        st.markdown("---")
-        st.markdown("**Proposed Michelin Tire**")
-        mich_price = st.number_input("Quoted Price ($)", value=550.0, step=10.0, key="m_p")
-        mich_casing = st.number_input("Guaranteed Casing ($)", value=120.0, step=10.0, key="m_c")
-        mich_life = st.number_input("Projected Tread Mileage", value=180000, step=5000, key="m_l")
-        mich_events = st.number_input("Annual Events / Truck", value=0.8, step=0.1, key="m_e")
-        mich_event_cost = st.number_input("Cost per Service Call ($)", value=350.0, step=10.0, key="m_ec")
-        mich_fuel_gain = st.number_input("Fuel Efficiency Gain (%)", value=3.0, step=0.1, key="m_fg") / 100.0
+    with st.expander("Current Tire (Competitor)", expanded=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            comp_price = st.number_input("Price ($)", value=350.0, step=10.0, key="c_p")
+            comp_casing = st.number_input("Casing ($)", value=40.0, step=5.0, key="c_c")
+            comp_events = st.number_input("Events/Yr", value=1.5, step=0.1, key="c_e")
+        with col2:
+            comp_life = st.number_input("Tread Miles", value=120000, step=5000, key="c_l")
+            comp_event_cost = st.number_input("Event Cost($)", value=350.0, step=10.0, key="c_ec")
+            
+    with st.expander("Proposed Michelin Tire", expanded=True):
+        col3, col4 = st.columns(2)
+        with col3:
+            mich_price = st.number_input("Price ($)", value=550.0, step=10.0, key="m_p")
+            mich_casing = st.number_input("Casing ($)", value=120.0, step=10.0, key="m_c")
+            mich_events = st.number_input("Events/Yr", value=0.8, step=0.1, key="m_e")
+        with col4:
+            mich_life = st.number_input("Tread Miles", value=180000, step=5000, key="m_l")
+            mich_event_cost = st.number_input("Event Cost($)", value=350.0, step=10.0, key="m_ec")
+            mich_fuel_gain = st.number_input("Fuel Gain(%)", value=3.0, step=0.1, key="m_fg") / 100.0
 
 
 # Build Data Dicts
@@ -174,51 +121,41 @@ if tco['breakEvenMiles'] is not None and annual_miles > 0:
 else:
     roi_months = None
 
-# ----------------- MAIN CONTENT AREA -----------------
+# ----------------- COMPRESSED KPIs -----------------
 
-# 1. Giant Savings KPI
-st.markdown(f"""
-<div class="giant-savings-container" title="Fleet Savings = (Competitor Total Annual Cost - Michelin Total Annual Cost) × {num_trucks} Trucks. This combines Tire Hardware (Lifecycle), Fuel Efficiency gains, and Downtime reduction.">
-    <div class="giant-savings-label">Fleet Annual Savings</div>
-    <div class="giant-savings-value">${tco['fleetSavings']:,.0f}</div>
-    <div class="giant-savings-subtext">Optimized total cost reduction across {num_trucks} trucks</div>
-</div>
-""", unsafe_allow_html=True)
+kpi_col1, kpi_col2, kpi_col3 = st.columns([2, 1, 1])
 
-# 2. Secondary Metrics Row
-col1, col2 = st.columns(2)
-with col1:
+with kpi_col1:
+    st.markdown(f"""
+        <div style="background-color:#27509B; padding:15px; border-radius:8px; text-align:center; color:white; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+            <div style="font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:5px;">FLEET ANNUAL SAVINGS</div>
+            <div style="font-size:36px; font-weight:bold; color:#FCE500; line-height:1;">${tco['fleetSavings']:,.0f}</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+with kpi_col2:
     st.metric(
         "Savings Per Truck", 
         f"${tco['annualSavingsPerTruck']:,.0f}",
-        help="Net annual operational savings per truck minus any upfront hardware premium."
+        help="Combines Tire Lifecycle, Fuel Efficiency, and Downtime reduction."
     )
-with col2:
+
+with kpi_col3:
     if tco['breakEvenMiles'] is None:
         be_val = "Never Break Even"
-        roi_text = "Operational constraints offset savings"
+        roi_text = "Operational constraints"
     elif tco['breakEvenMiles'] == 0:
         be_val = "Instant ROI"
-        roi_text = "Michelin is cheaper upfront"
+        roi_text = "Cheaper upfront"
     else:
         be_val = f"{tco['breakEvenMiles']:,.0f} mi"
         roi_text = f"Pays for itself in ~{round(roi_months, 1)} Months"
         
-    st.markdown(f"""
-    <div class="secondary-metric" title="Break-Even = (Michelin Upfront Premium) ÷ (Operational Savings per Mile). The exact odometer mark where fuel & downtime savings entirely pay off the higher initial tire price.">
-        <div>
-            <div class="sec-title">Break-Even Mileage</div>
-            <div style="font-size: 0.8rem; color: #94A3B8;">Distance to offset initial premium</div>
-        </div>
-        <div>
-            <div class="sec-value">{be_val}</div>
-            <div class="sec-subtext">{roi_text}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.metric("Break-Even Mileage", be_val, delta=roi_text, delta_color="off")
 
-# 3. Waterfall Chart for Cost Bridge
-st.markdown("### Cost of Inaction Bridge (Per Truck)")
+st.divider()
+
+# ----------------- CHART SECTION -----------------
 
 comp_total = tco['competitor']['total']
 mich_total = tco['michelin']['total']
@@ -290,8 +227,10 @@ if tire_step < 0:
 axis_min = min_y * 0.95
 axis_max = max_y * 1.05
 
-# 6. Layout updates
+# 6. Layout updates (Enforcing strict height constraint and zero vertical margins)
 fig.update_layout(
+    height=380,
+    margin=dict(t=40, b=10, l=10, r=10),
     title="",
     barmode='overlay',
     waterfallgap=0.3,
@@ -309,13 +248,7 @@ fig.update_layout(
         gridcolor='rgba(0,0,0,0)',
         tickfont=dict(size=14) 
     ),
-    margin=dict(l=40, r=40, t=30, b=40),
     hovermode='x unified'
 )
 
-st.plotly_chart(fig, use_container_width=True)
-
-st.markdown("<br><br>", unsafe_allow_html=True)
-colCTA1, colCTA2, colCTA3 = st.columns([1, 2, 1])
-with colCTA2:
-    st.button("Contact a Fleet Expert", type="primary", use_container_width=True)
+st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
