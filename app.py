@@ -69,14 +69,14 @@ with st.sidebar:
             comp_casing = st.number_input("Casing ($)", value=40.0, step=5.0, key="c_c")
             comp_events = st.number_input("Events/Yr", value=1.5, step=0.1, key="c_e")
         with col2:
-            comp_life = st.number_input("Tread Miles", value=120000, step=5000, key="c_l")
+            comp_life = st.number_input("Tread Miles", value=100000, step=5000, key="c_l")
             comp_event_cost = st.number_input("Event Cost($)", value=350.0, step=10.0, key="c_ec")
             
     with st.expander("Proposed Michelin Tire", expanded=True):
         col3, col4 = st.columns(2)
         with col3:
             mich_price = st.number_input("Price ($)", value=550.0, step=10.0, key="m_p")
-            mich_casing = st.number_input("Casing ($)", value=120.0, step=10.0, key="m_c")
+            mich_casing = st.number_input("Casing ($)", value=75.0, step=5.0, key="m_c")
             mich_events = st.number_input("Events/Yr", value=0.8, step=0.1, key="m_e")
         with col4:
             mich_life = st.number_input("Tread Miles", value=180000, step=5000, key="m_l")
