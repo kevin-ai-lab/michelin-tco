@@ -158,26 +158,28 @@ st.divider()
 # ----------------- CHART SECTION -----------------
 
 # 3. Waterfall Chart for Cost Bridge
-st.markdown("### Cost of Inaction Bridge (Total Fleet)")
+st.markdown("### Tire-Related Operating Costs & Penalties")
 
-# Multiply per-truck metrics by the total number of trucks to scale the chart
 num_trucks = fleet_data['numTrucks']
 
-comp_total = tco['competitor']['total'] * num_trucks
-mich_total = tco['michelin']['total'] * num_trucks
+# 1. Update Starting Bar: Isolate the massive base fuel to emphasize penalties
+mich_total = (tco['michelin']['hardware'] + tco['michelin']['downtime']) * num_trucks
 
-# 1. Math: Calculate the steps to get FROM Michelin TO Competitor for the whole fleet
+# 2. Keep the Steps Exactly the Same (Delta Math)
 tire_step = (tco['competitor']['hardware'] - tco['michelin']['hardware']) * num_trucks
 fuel_step = (tco['competitor']['fuel'] - tco['michelin']['fuel']) * num_trucks
 downtime_step = (tco['competitor']['downtime'] - tco['michelin']['downtime']) * num_trucks
 
+# 3. Update the Final Bar: Recalculate from the new baseline
+comp_total = mich_total + tire_step + fuel_step + downtime_step
+
 # 2. Define the new X-Axis Labels
 x_labels = [
-    "Michelin Total", 
+    "Michelin Total<br>(Excl. Fuel)", 
     "Early Replacement Penalty", 
     "Excess Fuel Cost", 
     "Excess Downtime Cost", 
-    "Competitor Total"
+    "Competitor Total<br>(Excl. Base Fuel)"
 ]
 
 # 3. Format text labels dynamically
