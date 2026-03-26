@@ -181,6 +181,7 @@ max_y = max(mich_total, max_possible_total, red_box_value)
 # 2. Define the new X-Axis Labels
 x_labels = [
     "Michelin Total<br>(Excl. Fuel)", 
+    "Competitor Total<br>(Excl. Fuel)",
     "Early Replacement Penalty", 
     "Excess Fuel Cost", 
     "Excess Downtime Cost",
@@ -196,10 +197,11 @@ def format_label(val):
 
 text_labels = [
     f"${mich_total:,.0f}", 
+    "", # Empty text for the green Competitor Box overlay slot
     format_label(tire_step), 
     format_label(fuel_step), 
     format_label(downtime_step),
-    "" # Empty text for the invisible waterfall slot
+    "" # Empty text for the custom Red Box slot
 ]
 
 fig = go.Figure()
@@ -208,9 +210,9 @@ fig = go.Figure()
 fig.add_trace(go.Waterfall(
     name="Cost of Inaction",
     orientation="v",
-    measure=["absolute", "relative", "relative", "relative", "absolute"],
+    measure=["absolute", "relative", "relative", "relative", "relative", "absolute"],
     x=x_labels,
-    y=[mich_total, tire_step, fuel_step, downtime_step, 0], # 0 creates the slot without drawing a blue totals bar
+    y=[mich_total, 0, tire_step, fuel_step, downtime_step, 0], # 0 creates the invisible overlay slots
     text=text_labels,
     textposition="outside",
     hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>",
@@ -218,6 +220,17 @@ fig.add_trace(go.Waterfall(
     decreasing={"marker": {"color": "#10B981"}}, # Green
     totals={"marker": {"color": "#27509B"}},     # Official Michelin Blue for the base bar (Left)
     connector={"line": {"color": "rgb(200, 200, 200)", "width": 1, "dash": "dot"}},
+))
+
+# 4.5 Overlay the Green Competitor Box based on pure purchase price
+fig.add_trace(go.Bar(
+    x=["Competitor Total<br>(Excl. Fuel)"], 
+    y=[comp_tires_initial_cost], 
+    marker_color="#10B981", # Green Box requested by user
+    hoverinfo="skip",
+    showlegend=False,
+    text=[f"<b>${comp_tires_initial_cost:,.0f}</b>"], 
+    textposition="outside",
 ))
 
 # 5. Overlay the Custom Red Box at the identical X-Axis string
