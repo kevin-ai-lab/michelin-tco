@@ -5,11 +5,7 @@ from tco_math import calculate_tco
 
 st.set_page_config(page_title="MICHELIN B2B TCO Calculator", layout="wide", page_icon="🛞", initial_sidebar_state="expanded")
 
-# Michelin Corporate Logo
-try:
-    st.logo("https://upload.wikimedia.org/wikipedia/commons/4/41/Michelin_Logo.svg")
-except Exception:
-    pass # Fallback for older Streamlit versions
+# Removed corporate logo per user request
 
 # Inject Custom Light-Mode B2B CSS
 st.markdown("""
@@ -30,15 +26,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- HEADER & CTA -----------------
-header_col, cta_col = st.columns([3, 1])
-
-with header_col:
-    st.title("B2B TCO Calculator")
-
-with cta_col:
-    st.write("") # Small vertical spacer to align
-    st.button("Contact a Fleet Expert", type="primary", use_container_width=True)
+# ----------------- HEADER -----------------
+st.title("B2B TCO Calculator")
 
 
 # ----------------- REORGANIZED SIDEBAR CONTROLS -----------------
