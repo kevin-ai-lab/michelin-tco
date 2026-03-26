@@ -5,7 +5,13 @@ from tco_math import calculate_tco
 
 st.set_page_config(page_title="MICHELIN B2B TCO Calculator", layout="wide", page_icon="🛞", initial_sidebar_state="expanded")
 
-# Inject premium CSS (Custom UI Typography & Metrics)
+# Michelin Corporate Logo
+try:
+    st.logo("https://upload.wikimedia.org/wikipedia/commons/4/41/Michelin_Logo.svg")
+except Exception:
+    pass # Fallback for older Streamlit versions
+
+# Inject Custom Light-Mode B2B CSS
 st.markdown("""
 <style>
     /* Headers & Text */
@@ -21,18 +27,17 @@ st.markdown("""
         color: #27509B !important;
     }
 
-    /* Giant Fleet Savings Metric */
+    /* Giant Fleet Savings Metric - Navy Box for Contrast against #FCE500 */
     .giant-savings-container {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background: rgba(252, 229, 0, 0.05);
-        border: 2px solid rgba(252, 229, 0, 0.2);
-        border-radius: 16px;
-        padding: 2rem;
+        background: #27509B;
+        border-radius: 12px;
+        padding: 2.5rem;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 40px rgba(252, 229, 0, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
     .giant-savings-label {
         color: #FFFFFF;
@@ -47,18 +52,18 @@ st.markdown("""
         font-size: 5rem;
         font-weight: 900;
         line-height: 1;
-        text-shadow: 0 0 20px rgba(252, 229, 0, 0.3);
+        /* Text glow removed as requested */
     }
     .giant-savings-subtext {
-        color: #94A3B8;
+        color: #E2E8F0;
         font-size: 1rem;
         margin-top: 0.5rem;
     }
 
     /* Demoted Break Even Metric */
     .secondary-metric {
-        background: rgba(39, 80, 155, 0.1);
-        border: 1px solid rgba(39, 80, 155, 0.3);
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
         border-radius: 12px;
         padding: 1rem 1.5rem;
         display: flex;
@@ -67,58 +72,63 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     .sec-title {
-        color: #CBD5E1;
+        color: #64748B;
         font-size: 1rem;
         font-weight: 500;
     }
     .sec-value {
-        color: #FFFFFF;
+        color: #0F172A;
         font-size: 1.5rem;
         font-weight: 700;
     }
+    .sec-subtext {
+        color: #10B981; /* Green delta color */
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-align: right;
+    }
 
-    /* Streamlit Metric Overrides */
+    /* Streamlit Metric Overrides for Light Mode */
     div[data-testid="stMetric"] {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 12px;
         padding: 1rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
-    div[data-testid="stMetricValue"] {
-        color: #FFFFFF !important;
-    }
-
 </style>
 """, unsafe_allow_html=True)
 
-# Main Title Let's align it left
-st.markdown('<h1><span class="yellow-text">MICHELIN</span> TCO Calculator</h1>', unsafe_allow_html=True)
+# Main Title (Styling removed logo string from title)
+st.markdown('<h1>B2B TCO Calculator</h1>', unsafe_allow_html=True)
 
-# ----------------- SIDEBAR CONTROLS -----------------
+# ----------------- REORGANIZED SIDEBAR CONTROLS -----------------
 with st.sidebar:
     st.markdown('<h2>Parameters</h2>', unsafe_allow_html=True)
     
-    with st.expander("⚙️ Fleet Baseline", expanded=True):
+    with st.expander("Fleet Profile", expanded=True):
         colA, colB = st.columns(2)
         num_trucks = colA.number_input("Total Class 8 Trucks", value=50, step=1)
         tires_per_truck = colB.number_input("Tires per Truck", value=18, step=1)
-        
         annual_miles = st.number_input("Annual Miles/Truck", value=100000, step=1000)
         mpg = st.number_input("Fleet Avg MPG", value=6.5, step=0.1)
+
+    with st.expander("Operating Costs", expanded=True):
         fuel_price = st.number_input("Fuel Price / Gallon ($)", value=4.00, step=0.05)
-        
         colC, colD = st.columns(2)
         downtime_cost = colC.number_input("Downtime Cost/Hr ($)", value=120.0, step=5.0)
         downtime_hours = colD.number_input("Hours per Event", value=3.0, step=0.5)
 
-    with st.expander("⚠️ Current Tire (Competitor)", expanded=True):
+    with st.expander("Tire Parameters", expanded=True):
+        st.markdown("**Current Tire (Competitor)**")
         comp_price = st.number_input("Purchase Price ($)", value=350.0, step=10.0, key="c_p")
         comp_casing = st.number_input("Casing Value ($)", value=40.0, step=5.0, key="c_c")
         comp_life = st.number_input("Expected Tread Mileage", value=120000, step=5000, key="c_l")
         comp_events = st.number_input("Annual Events / Truck", value=1.5, step=0.1, key="c_e")
         comp_event_cost = st.number_input("Cost per Service Call ($)", value=350.0, step=10.0, key="c_ec")
-
-    with st.expander("🛡️ Michelin Tire", expanded=True):
+        
+        st.markdown("---")
+        st.markdown("**Proposed Michelin Tire**")
         mich_price = st.number_input("Quoted Price ($)", value=550.0, step=10.0, key="m_p")
         mich_casing = st.number_input("Guaranteed Casing ($)", value=120.0, step=10.0, key="m_c")
         mich_life = st.number_input("Projected Tread Mileage", value=180000, step=5000, key="m_l")
@@ -164,6 +174,9 @@ extra_rev = {
 # Calculate TCO
 tco = calculate_tco(fleet_data, comp_tire, mich_tire, extra_rev)
 
+# Time to ROI Calculation (Months)
+roi_months = (tco['breakEvenMiles'] / annual_miles) * 12 if annual_miles > 0 else 0
+
 # ----------------- MAIN CONTENT AREA -----------------
 
 # 1. Giant Savings KPI
@@ -181,10 +194,18 @@ with col1:
     st.metric("Savings Per Truck", f"${tco['annualSavingsPerTruck']:,.0f}")
 with col2:
     be_val = f"{tco['breakEvenMiles']:,.0f} mi" if tco['breakEvenMiles'] > 0 else "N/A"
+    roi_text = f"Pays for itself in ~{round(roi_months, 1)} Months" if roi_months > 0 else ""
+    
     st.markdown(f"""
     <div class="secondary-metric">
-        <div class="sec-title">Break-Even Mileage</div>
-        <div class="sec-value">{be_val}</div>
+        <div>
+            <div class="sec-title">Break-Even Mileage</div>
+            <div style="font-size: 0.8rem; color: #94A3B8;">Distance to offset initial premium</div>
+        </div>
+        <div>
+            <div class="sec-value">{be_val}</div>
+            <div class="sec-subtext">{roi_text}</div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -194,16 +215,22 @@ st.markdown("### Total Cost of Ownership Bridge (Per Truck)")
 comp_total = tco['competitor']['total']
 mich_total = tco['michelin']['total']
 
-# Delta calculations (From Competitor to Michelin)
-# Positive means Michelin costs MORE (upward step)
-# Negative means Michelin costs LESS (downward step - savings)
 hw_delta = tco['michelin']['hardware'] - tco['competitor']['hardware']
 fuel_delta = tco['michelin']['fuel'] - tco['competitor']['fuel']
 dt_delta = tco['michelin']['downtime'] - tco['competitor']['downtime']
 
-x_labels = ["Competitor Total", "Hardware Diff", "Fuel Savings", "Downtime Savings", "Michelin Total"]
+x_labels = ["Competitor Total", "Tire Cost Difference", "Fuel Savings", "Downtime Savings", "Michelin Total"]
 y_values = [comp_total, hw_delta, fuel_delta, dt_delta, mich_total]
 measures = ["absolute", "relative", "relative", "relative", "total"]
+
+# Calculate Y-axis truncation range
+min_y = min(comp_total, mich_total)
+max_y = max(comp_total, mich_total)
+if hw_delta > 0:
+    max_y = max(max_y, comp_total + hw_delta)
+
+axis_min = min_y * 0.95
+axis_max = max_y * 1.05
 
 fig = go.Figure(go.Waterfall(
     name="TCO",
@@ -211,29 +238,33 @@ fig = go.Figure(go.Waterfall(
     measure=measures,
     x=x_labels,
     textposition="outside",
-    # Label text formats
-    text=[f"${v:,.0f}" for v in y_values],
+    # Absolute value formatting for step labels
+    text=[f"${abs(v):,.0f}" for v in y_values],
     y=y_values,
-    connector={"line": {"color": "rgb(63, 63, 63)", "width": 1, "dash": "dot"}},
-    decreasing={"marker": {"color": "#4ade80"}},  # Green for savings (decrease in cost)
-    increasing={"marker": {"color": "#ef4444"}},  # Red for added cost (like higher hardware price)
+    connector={"line": {"color": "rgb(200, 200, 200)", "width": 1, "dash": "dot"}},
+    decreasing={"marker": {"color": "#10B981"}},  # Tailwind Emerald for savings
+    increasing={"marker": {"color": "#EF4444"}},  # Red for added cost
     totals={"marker": {"color": "#27509B"}},      # Michelin Blue for totals
 ))
 
+# Set background to transparent since we are in light mode
 fig.update_layout(
     title="",
-    waterfallgap=0.2,
+    waterfallgap=0.3,
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
-    font=dict(color='#FFFFFF'),
+    font=dict(color='#0F172A'),
     yaxis=dict(
-        gridcolor='rgba(255,255,255,0.1)', 
+        gridcolor='#E2E8F0', 
         tickprefix='$', 
-        zeroline=True, 
-        zerolinecolor='rgba(255,255,255,0.2)'
+        zeroline=False,
+        range=[axis_min, axis_max] # Truncated Y-Axis
     ),
-    xaxis=dict(gridcolor='rgba(255,255,255,0.0)'),
-    margin=dict(l=40, r=40, t=20, b=40),
+    xaxis=dict(
+        gridcolor='rgba(0,0,0,0)',
+        tickfont=dict(size=14) # Increased typography
+    ),
+    margin=dict(l=40, r=40, t=30, b=40),
     hovermode='x unified'
 )
 
@@ -242,3 +273,8 @@ fig.update_traces(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
+st.markdown("<br><br>", unsafe_allow_html=True)
+colCTA1, colCTA2, colCTA3 = st.columns([1, 2, 1])
+with colCTA2:
+    st.button("Contact a Fleet Expert", type="primary", use_container_width=True)
