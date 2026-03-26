@@ -194,13 +194,14 @@ def format_label(val):
     else:
         return f"-${abs(val):,.0f}"
 
+# Restore all strings natively to the Waterfall to preserve interactive tooltips
 text_labels = [
     f"${mich_tires_initial_cost:,.0f}", 
-    "", # Empty text for the green Competitor Box overlay slot
+    f"${comp_tires_initial_cost:,.0f}", 
     format_label(tire_step), 
     format_label(fuel_step), 
     format_label(downtime_step),
-    "" # Empty text for the custom Red Box slot
+    f"${red_box_value:,.0f}" 
 ]
 
 fig = go.Figure()
@@ -209,9 +210,9 @@ fig = go.Figure()
 fig.add_trace(go.Waterfall(
     name="Cost of Inaction",
     orientation="v",
-    measure=["absolute", "absolute", "relative", "relative", "relative", "absolute"],
+    measure=["absolute", "absolute", "relative", "relative", "relative", "total"], # Switch last measure to 'total'
     x=x_labels,
-    y=[mich_tires_initial_cost, comp_tires_initial_cost, tire_step, fuel_step, downtime_step, 0], # 0 creates the invisible overlay slots
+    y=[mich_tires_initial_cost, comp_tires_initial_cost, tire_step, fuel_step, downtime_step, 0], 
     text=text_labels,
     textposition="outside",
     hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>",
@@ -228,8 +229,8 @@ fig.add_trace(go.Bar(
     marker_color="#10B981", # Green Box requested by user
     hoverinfo="skip",
     showlegend=False,
-    text=[f"<b>${comp_tires_initial_cost:,.0f}</b>"], 
-    textposition="outside",
+    text=[""], # Hide text to prevent double-printing from the active waterfall below it
+    textposition="none",
 ))
 
 # 5. Overlay the Custom Red Box at the identical X-Axis string
@@ -239,8 +240,8 @@ fig.add_trace(go.Bar(
     marker_color="#EF4444", # Red Box requested by user
     hoverinfo="skip",
     showlegend=False,
-    text=[f"<b>${red_box_value:,.0f}</b>"], 
-    textposition="outside",
+    text=[""], # Hide text to prevent double-printing
+    textposition="none",
 ))
 
 # Calculate Y-axis truncation range
