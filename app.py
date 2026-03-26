@@ -178,7 +178,7 @@ else:
 
 # 1. Giant Savings KPI
 st.markdown(f"""
-<div class="giant-savings-container">
+<div class="giant-savings-container" title="Fleet Savings = (Competitor Total Annual Cost - Michelin Total Annual Cost) × {num_trucks} Trucks. This combines Tire Hardware (Lifecycle), Fuel Efficiency gains, and Downtime reduction.">
     <div class="giant-savings-label">Fleet Annual Savings</div>
     <div class="giant-savings-value">${tco['fleetSavings']:,.0f}</div>
     <div class="giant-savings-subtext">Optimized total cost reduction across {num_trucks} trucks</div>
@@ -188,7 +188,11 @@ st.markdown(f"""
 # 2. Secondary Metrics Row
 col1, col2 = st.columns(2)
 with col1:
-    st.metric("Savings Per Truck", f"${tco['annualSavingsPerTruck']:,.0f}")
+    st.metric(
+        "Savings Per Truck", 
+        f"${tco['annualSavingsPerTruck']:,.0f}",
+        help="Net annual operational savings per truck minus any upfront hardware premium."
+    )
 with col2:
     if tco['breakEvenMiles'] is None:
         be_val = "Never Break Even"
@@ -201,7 +205,7 @@ with col2:
         roi_text = f"Pays for itself in ~{round(roi_months, 1)} Months"
         
     st.markdown(f"""
-    <div class="secondary-metric">
+    <div class="secondary-metric" title="Break-Even = (Michelin Upfront Premium) ÷ (Operational Savings per Mile). The exact odometer mark where fuel & downtime savings entirely pay off the higher initial tire price.">
         <div>
             <div class="sec-title">Break-Even Mileage</div>
             <div style="font-size: 0.8rem; color: #94A3B8;">Distance to offset initial premium</div>
