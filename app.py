@@ -157,13 +157,19 @@ st.divider()
 
 # ----------------- CHART SECTION -----------------
 
-comp_total = tco['competitor']['total']
-mich_total = tco['michelin']['total']
+# 3. Waterfall Chart for Cost Bridge
+st.markdown("### Cost of Inaction Bridge (Total Fleet)")
 
-# 1. Math: Calculate the steps to get FROM Michelin TO Competitor
-tire_step = tco['competitor']['hardware'] - tco['michelin']['hardware']
-fuel_step = tco['competitor']['fuel'] - tco['michelin']['fuel']
-downtime_step = tco['competitor']['downtime'] - tco['michelin']['downtime']
+# Multiply per-truck metrics by the total number of trucks to scale the chart
+num_trucks = fleet_data['numTrucks']
+
+comp_total = tco['competitor']['total'] * num_trucks
+mich_total = tco['michelin']['total'] * num_trucks
+
+# 1. Math: Calculate the steps to get FROM Michelin TO Competitor for the whole fleet
+tire_step = (tco['competitor']['hardware'] - tco['michelin']['hardware']) * num_trucks
+fuel_step = (tco['competitor']['fuel'] - tco['michelin']['fuel']) * num_trucks
+downtime_step = (tco['competitor']['downtime'] - tco['michelin']['downtime']) * num_trucks
 
 # 2. Define the new X-Axis Labels
 x_labels = [
