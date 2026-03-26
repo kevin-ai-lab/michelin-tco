@@ -218,72 +218,84 @@ with col2:
     """, unsafe_allow_html=True)
 
 # 3. Waterfall Chart for Cost Bridge
-st.markdown("### Total Cost of Ownership Bridge (Per Truck)")
+st.markdown("### Cost of Inaction Bridge (Per Truck)")
 
 comp_total = tco['competitor']['total']
 mich_total = tco['michelin']['total']
 
-hw_delta = tco['michelin']['hardware'] - tco['competitor']['hardware']
-fuel_delta = tco['michelin']['fuel'] - tco['competitor']['fuel']
-dt_delta = tco['michelin']['downtime'] - tco['competitor']['downtime']
+# 1. Math: Calculate the steps to get FROM Michelin TO Competitor
+tire_step = tco['competitor']['hardware'] - tco['michelin']['hardware']
+fuel_step = tco['competitor']['fuel'] - tco['michelin']['fuel']
+downtime_step = tco['competitor']['downtime'] - tco['michelin']['downtime']
 
-x_labels = ["Tire Cost Difference", "Fuel Savings", "Downtime Savings", "Michelin Total"]
-y_values = [hw_delta, fuel_delta, dt_delta, mich_total]
-measures = ["relative", "relative", "relative", "total"]
+# 2. Define the new X-Axis Labels
+x_labels = [
+    "Michelin Total", 
+    "Extra Tire Cost", 
+    "Excess Fuel Cost", 
+    "Excess Downtime Cost", 
+    "Competitor Total"
+]
+
+# 3. Format text labels dynamically
+def format_label(val):
+    if val > 0:
+        return f"+${val:,.0f}"
+    else:
+        return f"-${abs(val):,.0f}"
+
+text_labels = [
+    f"${mich_total:,.0f}", 
+    format_label(tire_step), 
+    format_label(fuel_step), 
+    format_label(downtime_step), 
+    f"${comp_total:,.0f}"
+]
+
+fig = go.Figure()
+
+# 4. Build the Reversed Waterfall
+fig.add_trace(go.Waterfall(
+    name="Cost of Inaction",
+    orientation="v",
+    measure=["absolute", "relative", "relative", "relative", "total"],
+    x=x_labels,
+    y=[mich_total, tire_step, fuel_step, downtime_step, comp_total],
+    text=text_labels,
+    textposition="outside",
+    hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>",
+    increasing={"marker": {"color": "#EF4444"}}, # Red Alert for extra costs
+    decreasing={"marker": {"color": "#10B981"}}, # Green
+    totals={"marker": {"color": "#27509B"}},     # Official Michelin Blue for the base bar (Left)
+    connector={"line": {"color": "rgb(200, 200, 200)", "width": 1, "dash": "dot"}},
+))
+
+# 5. The Overlay Trick (To ensure the final Competitor bar is Orange)
+fig.add_trace(go.Bar(
+    x=["Competitor Total"], 
+    y=[comp_total], 
+    marker_color="#F97316", # Orange
+    hoverinfo="skip",       # Keeps the Waterfall tooltip active underneath
+    showlegend=False,
+    text=[f"${comp_total:,.0f}"], # Ensure height spacing remains correct, but hide text visually to avoid doubling
+    textposition="none"
+))
 
 # Calculate Y-axis truncation range
 min_y = min(comp_total, mich_total)
 max_y = max(comp_total, mich_total)
-if hw_delta > 0:
-    max_y = max(max_y, comp_total + hw_delta)
+if tire_step < 0:
+    min_y = min(min_y, mich_total + tire_step)
 
 axis_min = min_y * 0.95
 axis_max = max_y * 1.05
 
-fig = go.Figure()
-
-# 1. Competitor Total Bar (Explicitly Orange)
-fig.add_trace(go.Bar(
-    name="Competitor",
-    x=["Competitor Total"],
-    y=[comp_total],
-    marker_color="#F97316",
-    text=[f"${comp_total:,.0f}"],
-    textposition="outside",
-    hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>"
-))
-
-# 2. Michelin TCO Bridge (Waterfall starting from Competitor's height)
-fig.add_trace(go.Waterfall(
-    name="TCO",
-    orientation="v",
-    measure=measures,
-    x=x_labels,
-    y=y_values,
-    base=comp_total,
-    textposition="outside",
-    text=[f"${abs(v):,.0f}" for v in y_values],
-    connector={"line": {"color": "rgb(200, 200, 200)", "width": 1, "dash": "dot"}},
-    decreasing={"marker": {"color": "#10B981"}},  # Green for savings
-    increasing={"marker": {"color": "#EF4444"}},  # Red for added cost
-    totals={"marker": {"color": "#27509B"}},      # Michelin Blue for totals
-    hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>"
-))
-
-# 3. Add manual connector line to bridge the two traces visually
-fig.add_shape(
-    type="line",
-    x0="Competitor Total", y0=comp_total,
-    x1="Tire Cost Difference", y1=comp_total,
-    line=dict(color="rgb(200, 200, 200)", width=1, dash="dot"),
-    layer="below"
-)
-
-# Set background to transparent since we are in light mode
+# 6. Layout updates
 fig.update_layout(
     title="",
-    showlegend=False,
+    barmode='overlay',
     waterfallgap=0.3,
+    showlegend=False,
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
     font=dict(color='#0F172A'),
@@ -295,14 +307,10 @@ fig.update_layout(
     ),
     xaxis=dict(
         gridcolor='rgba(0,0,0,0)',
-        tickfont=dict(size=14) # Increased typography
+        tickfont=dict(size=14) 
     ),
     margin=dict(l=40, r=40, t=30, b=40),
     hovermode='x unified'
-)
-
-fig.update_traces(
-    hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>"
 )
 
 st.plotly_chart(fig, use_container_width=True)
