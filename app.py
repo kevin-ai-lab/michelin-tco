@@ -170,16 +170,15 @@ tire_step = (tco['competitor']['hardware'] - tco['michelin']['hardware']) * num_
 fuel_step = (tco['competitor']['fuel'] - tco['michelin']['fuel']) * num_trucks
 downtime_step = (tco['competitor']['downtime'] - tco['michelin']['downtime']) * num_trucks
 
-# 3. Update the Final Bar: Recalculate from the new baseline
-comp_total = mich_total + tire_step + fuel_step + downtime_step
+# 3. Update the Maximum Chart Height: Recalculate max theoretical height
+max_possible_total = mich_total + tire_step + fuel_step + downtime_step
 
 # 2. Define the new X-Axis Labels
 x_labels = [
     "Michelin Total<br>(Excl. Fuel)", 
     "Early Replacement Penalty", 
     "Excess Fuel Cost", 
-    "Excess Downtime Cost", 
-    "Competitor Total<br>(Excl. Base Fuel)"
+    "Excess Downtime Cost"
 ]
 
 # 3. Format text labels dynamically
@@ -193,19 +192,18 @@ text_labels = [
     f"${mich_total:,.0f}", 
     format_label(tire_step), 
     format_label(fuel_step), 
-    format_label(downtime_step), 
-    f"${comp_total:,.0f}"
+    format_label(downtime_step)
 ]
 
 fig = go.Figure()
 
-# 4. Build the Reversed Waterfall
+# 4. Build the Open-Ended Waterfall
 fig.add_trace(go.Waterfall(
     name="Cost of Inaction",
     orientation="v",
-    measure=["absolute", "relative", "relative", "relative", "total"],
+    measure=["absolute", "relative", "relative", "relative"],
     x=x_labels,
-    y=[mich_total, tire_step, fuel_step, downtime_step, comp_total],
+    y=[mich_total, tire_step, fuel_step, downtime_step],
     text=text_labels,
     textposition="outside",
     hovertemplate="<b>%{x}</b><br>Amount: %{text}<extra></extra>",
@@ -215,22 +213,14 @@ fig.add_trace(go.Waterfall(
     connector={"line": {"color": "rgb(200, 200, 200)", "width": 1, "dash": "dot"}},
 ))
 
-# 5. The Overlay Trick (To ensure the final Competitor bar is Orange)
-fig.add_trace(go.Bar(
-    x=["Competitor Total"], 
-    y=[comp_total], 
-    marker_color="#F97316", # Orange
-    hoverinfo="skip",       # Keeps the Waterfall tooltip active underneath
-    showlegend=False,
-    text=[f"${comp_total:,.0f}"], # Ensure height spacing remains correct, but hide text visually to avoid doubling
-    textposition="none"
-))
-
 # Calculate Y-axis truncation range
-min_y = min(comp_total, mich_total)
-max_y = max(comp_total, mich_total)
+min_y = mich_total
+max_y = max(mich_total, max_possible_total)
+
 if tire_step < 0:
     min_y = min(min_y, mich_total + tire_step)
+if fuel_step < 0:
+    min_y = min(min_y, mich_total + tire_step + fuel_step)
 
 axis_min = min_y * 0.95
 axis_max = max_y * 1.05
