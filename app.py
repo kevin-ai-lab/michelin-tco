@@ -165,17 +165,14 @@ mich_tire = {
     'fuelImprovementPct': mich_fuel_gain
 }
 
-extra_rev = {
-    'weightSaved': 0,
-    'revenuePerLb': 0,
-    'annualTrips': 0
-}
-
 # Calculate TCO
-tco = calculate_tco(fleet_data, comp_tire, mich_tire, extra_rev)
+tco = calculate_tco(fleet_data, comp_tire, mich_tire)
 
 # Time to ROI Calculation (Months)
-roi_months = (tco['breakEvenMiles'] / annual_miles) * 12 if annual_miles > 0 else 0
+if tco['breakEvenMiles'] is not None and annual_miles > 0:
+    roi_months = (tco['breakEvenMiles'] / annual_miles) * 12
+else:
+    roi_months = None
 
 # ----------------- MAIN CONTENT AREA -----------------
 
@@ -193,9 +190,16 @@ col1, col2 = st.columns(2)
 with col1:
     st.metric("Savings Per Truck", f"${tco['annualSavingsPerTruck']:,.0f}")
 with col2:
-    be_val = f"{tco['breakEvenMiles']:,.0f} mi" if tco['breakEvenMiles'] > 0 else "N/A"
-    roi_text = f"Pays for itself in ~{round(roi_months, 1)} Months" if roi_months > 0 else ""
-    
+    if tco['breakEvenMiles'] is None:
+        be_val = "Never Break Even"
+        roi_text = "Operational constraints offset savings"
+    elif tco['breakEvenMiles'] == 0:
+        be_val = "Instant ROI"
+        roi_text = "Michelin is cheaper upfront"
+    else:
+        be_val = f"{tco['breakEvenMiles']:,.0f} mi"
+        roi_text = f"Pays for itself in ~{round(roi_months, 1)} Months"
+        
     st.markdown(f"""
     <div class="secondary-metric">
         <div>
