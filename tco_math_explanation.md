@@ -64,18 +64,21 @@ This represents the absolute final **Year 1 Total** of choosing the budget tire.
 
 ## 3. The Executive Dashboard KPIs
 
-### Fleet Annual Savings (Year 1 Net Cash Flow)
-If the Competitor's 1-Year Total is $10,803, and you spent $9,900 on Michelin on Day 1, how much actual cash is left in your pocket at Month 12?
-> **Math:** $10,803 (Competitor Total) - $9,900 (Michelin Upfront) = **$903 Savings in Year 1**
-> *Scale this number by the "Total Trucks" slider to generate the massive "Fleet Annual Savings" metric.*
+### Fleet Annual Savings (Amortized GAAP)
+While the chart visualizes **Year 1 Immediate Cash Flow**, the top dashboard KPIs (Annual Savings) are calculated using **Amortized Lifecycle Economics**. This is the standard B2B fleet methodology, stretching the $9,900 upfront purchase across the full 180,000 miles it survives.
 
-**(Why this is brilliant:)** The physical distance on the chart between the top of the Michelin starting bar ($9,900) and the top of the Competitor Red Box ($10,803) is exactly $903. The top left number perfectly aligns with the visual "gap" driving the presentation point.
+Because the KPI assumes normalized averages across total tire longevity, it yields the true economic penalty of the competitor, ignoring the "Day 1 Cash Squeeze".
+> **Math:** `Competitor TCO (Amortized) - Michelin TCO (Amortized)`
+> **Competitor:** $5,580 (Tires) + $66,666 (Fuel) + $1,065 (Downtime) = $73,311
+> **Michelin:** $4,748 (Tires) + $63,492 (Fuel) + $568 (Downtime) = $68,808
+> **Amortized Annual Savings:** $73,311 - $68,808 = **$4,503 / Truck**
+> *Scale this number by the "Total Trucks" slider to generate the massive "Fleet Annual Savings" metric.*
 
 ### Break-Even Mileage (Time to ROI)
 How many miles must the truck drive before the $3,600 Michelin Day-1 Premium is mathematically paid off by the cheaper operational costs? 
 
-To find this, we sum up the total annualized operational savings (Hardware + Fuel + Downtime):
-> **Total Annualized Savings:** $832 + $3,174 + $497 = $4,503 / year
+To find this, we divide the Upfront Cash Premium by the pure Amortized Savings Per Mile:
+> **Michelin Upfront Cash Premium:** $3,600
 > **Savings Per Mile:** $4,503 ÷ 100,000 miles = $0.04503 saved for every mile driven.
 >
 > **Math:** $3,600 Premium ÷ $0.04503/mile = **79,946 Miles**
