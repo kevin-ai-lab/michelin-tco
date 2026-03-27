@@ -58,7 +58,7 @@ def calculate_tco(fleet_data, comp_tire, mich_tire):
     # 3. Final Savings & ROI Math
     upfront_delta_per_truck = (mich_tire['price'] - comp_tire['price']) * fleet_data['tiresPerTruck']
     
-    # Pure Amortized Annual Savings (GAAP mathematically flawless)
+    # Pure Amortized Annual Savings (Lifecycle Cost Analysis mathematically flawless)
     annual_savings_per_truck = comp_tco - mich_tco
     fleet_savings = annual_savings_per_truck * fleet_data['numTrucks']
     savings_per_mile = annual_savings_per_truck / fleet_data['annualMiles'] if fleet_data['annualMiles'] > 0 else 0

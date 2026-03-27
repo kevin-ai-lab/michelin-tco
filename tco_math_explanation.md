@@ -64,7 +64,7 @@ This represents the absolute final **Year 1 Total** of choosing the budget tire.
 
 ## 3. The Executive Dashboard KPIs
 
-### Fleet Annual Savings (Amortized GAAP)
+### Fleet Annual Savings (Lifecycle Cost Analysis)
 While the chart visualizes **Year 1 Immediate Cash Flow**, the top dashboard KPIs (Annual Savings) are calculated using **Amortized Lifecycle Economics**. This is the standard B2B fleet methodology, stretching the $9,900 upfront purchase across the full 180,000 miles it survives.
 
 Because the KPI assumes normalized averages across total tire longevity, it yields the true economic penalty of the competitor, ignoring the "Day 1 Cash Squeeze".
