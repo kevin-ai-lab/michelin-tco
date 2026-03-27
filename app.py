@@ -116,44 +116,48 @@ if tco['breakEvenMiles'] is not None and annual_miles > 0:
 else:
     roi_months = None
 
-# ----------------- COMPRESSED KPIs -----------------
+# ----------------- MAIN DASHBOARD TABS -----------------
+tab1, tab2 = st.tabs(["Dashboard", "How the Math Works"])
 
-kpi_col1, kpi_col2, kpi_col3 = st.columns([2, 1, 1])
+with tab1:
+    # ----------------- COMPRESSED KPIs -----------------
 
-with kpi_col1:
-    st.markdown(f"""
-        <div style="background-color:#27509B; padding:15px; border-radius:8px; text-align:center; color:white; height: 100%; display: flex; flex-direction: column; justify-content: center;">
-            <div style="font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:5px;">FLEET ANNUAL SAVINGS</div>
-            <div style="font-size:36px; font-weight:bold; color:#FCE500; line-height:1;">${tco['fleetSavings']:,.0f}</div>
-        </div>
-    """, unsafe_allow_html=True)
+    kpi_col1, kpi_col2, kpi_col3 = st.columns([2, 1, 1])
 
-with kpi_col2:
-    st.metric(
-        "Savings Per Truck", 
-        f"${tco['annualSavingsPerTruck']:,.0f}",
-        help="Combines Tire Lifecycle, Fuel Efficiency, and Downtime reduction."
-    )
+    with kpi_col1:
+        st.markdown(f"""
+            <div style="background-color:#27509B; padding:15px; border-radius:8px; text-align:center; color:white; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                <div style="font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:5px;">FLEET ANNUAL SAVINGS</div>
+                <div style="font-size:36px; font-weight:bold; color:#FCE500; line-height:1;">${tco['fleetSavings']:,.0f}</div>
+            </div>
+        """, unsafe_allow_html=True)
 
-with kpi_col3:
-    if tco['breakEvenMiles'] is None:
-        be_val = "Never Break Even"
-        roi_text = "Operational constraints"
-    elif tco['breakEvenMiles'] == 0:
-        be_val = "Instant ROI"
-        roi_text = "Cheaper upfront"
-    else:
-        be_val = f"{tco['breakEvenMiles']:,.0f} mi"
-        roi_text = f"Pays for itself in ~{round(roi_months, 1)} Months"
-        
-    st.metric("Break-Even Mileage", be_val, delta=roi_text, delta_color="off")
+    with kpi_col2:
+        st.metric(
+            "Savings Per Truck", 
+            f"${tco['annualSavingsPerTruck']:,.0f}",
+            help="Combines Tire Lifecycle, Fuel Efficiency, and Downtime reduction."
+        )
 
-st.divider()
+    with kpi_col3:
+        if tco['breakEvenMiles'] is None:
+            be_val = "Never Break Even"
+            roi_text = "Operational constraints"
+        elif tco['breakEvenMiles'] == 0:
+            be_val = "Instant ROI"
+            roi_text = "Cheaper upfront"
+        else:
+            be_val = f"{tco['breakEvenMiles']:,.0f} mi"
+            roi_text = f"Pays for itself in ~{round(roi_months, 1)} Months"
+            
+        st.metric("Break-Even Mileage", be_val, delta=roi_text, delta_color="off")
 
-# ----------------- CHART SECTION -----------------
+    st.divider()
 
-# 3. Waterfall Chart for Cost Bridge
-st.markdown("### Tire-Related Operating Costs & Penalties (Per Truck, over Annual Miles)")
+    # ----------------- CHART SECTION -----------------
+
+    # 3. Waterfall Chart for Cost Bridge
+    st.markdown("### Tire-Related Operating Costs & Penalties (Per Truck, over Annual Miles)")
 
 num_trucks = fleet_data['numTrucks']
 
@@ -263,4 +267,12 @@ fig.update_layout(
     hovermode='x unified'
 )
 
-st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+with tab1:
+    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+
+with tab2:
+    try:
+        with open("tco_math_explanation.md", "r") as f:
+            st.markdown(f.read())
+    except Exception:
+        st.info("Mathematical breakdown document is currently unavailable.")
