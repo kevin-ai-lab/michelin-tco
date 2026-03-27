@@ -183,7 +183,7 @@ x_labels = [
     "Early Replacement Penalty", 
     "Excess Fuel Cost", 
     "Excess Downtime Cost",
-    "Tire-Related Operating<br>Costs & Penalties"
+    "Total Competitor<br>Tire Cost"
 ]
 
 # 3. Format text labels dynamically
@@ -234,7 +234,7 @@ fig.add_trace(go.Bar(
 
 # 5. Overlay the Custom Red Box at the identical X-Axis string
 fig.add_trace(go.Bar(
-    x=["Tire-Related Operating<br>Costs & Penalties"], 
+    x=["Total Competitor<br>Tire Cost"], 
     y=[red_box_value], 
     marker_color="#EF4444", # Red Box requested by user
     hoverinfo="skip",
