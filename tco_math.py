@@ -56,19 +56,15 @@ def calculate_tco(fleet_data, comp_tire, mich_tire):
     mich_tco = mich_hardware + mich_fuel + mich_downtime
 
     # 3. Final Savings & ROI Math
-    # Calculate pure Amortized Annual Savings internally for accurate Break Even math
-    amortized_annual_savings = comp_tco - mich_tco
     upfront_delta_per_truck = (mich_tire['price'] - comp_tire['price']) * fleet_data['tiresPerTruck']
     
-    # Redefine dashboard KPIs to represent Year 1 Net Cash (to explicitly match the waterfall chart)
-    # Year 1 Net Cash = Operating Savings - Upfront Michelin Premium Cash Outlay
-    annual_savings_per_truck = amortized_annual_savings - upfront_delta_per_truck
+    # Pure Amortized Annual Savings (GAAP mathematically flawless)
+    annual_savings_per_truck = comp_tco - mich_tco
     fleet_savings = annual_savings_per_truck * fleet_data['numTrucks']
     savings_per_mile = annual_savings_per_truck / fleet_data['annualMiles'] if fleet_data['annualMiles'] > 0 else 0
     
-    # Break-Even Math updated to perfectly align with the Chart's 3 penalty blocks
-    # by using total annualized savings (Hardware + Fuel + Downtime)
-    total_savings_per_mile = amortized_annual_savings / fleet_data['annualMiles'] if fleet_data['annualMiles'] > 0 else 0
+    # Break-Even Math uses total annualized savings (Hardware + Fuel + Downtime)
+    total_savings_per_mile = savings_per_mile
 
     # Safe Break-Even Edge Cases
     if upfront_delta_per_truck <= 0:
