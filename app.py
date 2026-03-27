@@ -276,3 +276,10 @@ with tab2:
             st.markdown(f.read())
     except Exception:
         st.info("Mathematical breakdown document is currently unavailable.")
+
+# ----------------- FOOTER DISCLAIMER -----------------
+st.markdown("""
+    <div style="font-size: 11px; color: #94A3B8; text-align: center; margin-top: 30px;">
+        Calculations are estimates based on provided assumptions. Actual fuel efficiency, tire life, casing value, and downtime costs will vary based on route, driver behavior, and maintenance practices. This tool does not constitute a financial guarantee.
+    </div>
+""", unsafe_allow_html=True)
