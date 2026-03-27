@@ -60,7 +60,7 @@ with st.sidebar:
     with st.expander("Current Tire (Competitor)", expanded=True):
         col1, col2 = st.columns(2)
         with col1:
-            comp_price = st.number_input("Price ($)", value=350.0, step=10.0, key="c_p")
+            comp_price = st.number_input("Price ($)", value=435.23, step=10.0, key="c_p")
             comp_casing = st.number_input("Casing ($)", value=40.0, step=5.0, key="c_c")
             comp_events = st.number_input("Events/Yr", value=1.5, step=0.1, key="c_e")
         with col2:
@@ -128,14 +128,14 @@ with tab1:
         st.markdown(f"""
             <div style="background-color:#27509B; padding:15px; border-radius:8px; text-align:center; color:white; height: 100%; display: flex; flex-direction: column; justify-content: center;">
                 <div style="font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:5px;">FLEET ANNUAL SAVINGS</div>
-                <div style="font-size:36px; font-weight:bold; color:#FCE500; line-height:1;">${tco['fleetSavings']:,.0f}</div>
+                <div style="font-size:36px; font-weight:bold; color:#FCE500; line-height:1;">${tco['fleetSavings']:,.2f}</div>
             </div>
         """, unsafe_allow_html=True)
 
     with kpi_col2:
         st.metric(
             "Savings Per Truck", 
-            f"${tco['annualSavingsPerTruck']:,.0f}",
+            f"${tco['annualSavingsPerTruck']:,.2f}",
             help="Combines Tire Lifecycle, Fuel Efficiency, and Downtime reduction."
         )
 
@@ -189,18 +189,18 @@ x_labels = [
 # 3. Format text labels dynamically
 def format_label(val):
     if val > 0:
-        return f"+${val:,.0f}"
+        return f"+${val:,.2f}"
     else:
-        return f"-${abs(val):,.0f}"
+        return f"-${abs(val):,.2f}"
 
 # Restore all strings natively to the Waterfall to preserve interactive tooltips
 text_labels = [
-    f"${mich_tires_initial_cost:,.0f}", 
-    f"${comp_tires_initial_cost:,.0f}", 
+    f"${mich_tires_initial_cost:,.2f}", 
+    f"${comp_tires_initial_cost:,.2f}", 
     format_label(tire_step), 
     format_label(fuel_step), 
     format_label(downtime_step),
-    f"${red_box_value:,.0f}" 
+    f"${red_box_value:,.2f}" 
 ]
 
 fig = go.Figure()
